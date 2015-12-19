@@ -4,32 +4,45 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time 
 
+#################### Start function definitions ####################
+def initialize(CRN, url):
+	driver = webdriver.Chrome()
+	driver.get(url)
+	enterCRN = driver.find_element_by_id("course_number")
+	enterCRN.send_keys(CRN)
+	search(driver)
+	return driver 
+	
+#click search button
+def search(driver):
+	searchButton = driver.find_element_by_name("search")
+	searchButton.click()
+
+#pulls data from page, returns space available in the class 
+def pull(driver):
+	data = BeautifulSoup(driver.page_source, "html.parser")
+	for line in data.find_all(id = "courseResultsDiv"): 
+		space = line.find_all(title = "View Course Detail")[2].find("em").get_text()
+		space = int(space.strip())
+		return space 
+
+#################### End function definitions ####################
+
 CRN = input("Enter CRN of class: ") #Obtain CRN from user
 url = "https://registrar.ucdavis.edu/courses/search/index.cfm" #define URL to be class search website
+driver = initialize(CRN, url)
 
-#must dynamically generate html 
-driver = webdriver.Chrome()
-driver.get(url)
+time.sleep(5)
 
-#enter in CRN into text box 
-enterCRN = driver.find_element_by_id("course_number")
-enterCRN.send_keys(CRN)
+spacesAvailable = pull(driver)
 
-#click search button
-searchButton = driver.find_element_by_name("search")
-searchButton.click()
-
-time.sleep(5) #wait to load 
-
-#obtain generated html code into data 
-data = BeautifulSoup(driver.page_source, "html.parser")
-
-for line in data.find_all(id = "courseResultsDiv"): 
-	space = line.find_all(title = "View Course Detail")[2].find("em").get_text()
-	space = int(space.strip())
-	print space
-	print (space == 1)
+if spacesAvailable != 0:
+	print "There is space available in this class"
+else:
+	print "There is no space available in this class"
 
 driver.close() #close driver 
+
+
 		
 	
