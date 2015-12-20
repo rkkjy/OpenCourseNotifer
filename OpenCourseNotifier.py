@@ -3,6 +3,12 @@ from bs4 import BeautifulSoup
 from selenium import webdriver 
 from selenium.webdriver.common.keys import Keys
 import time 
+from twilio.rest import TwilioRestClient
+
+ACCOUNT_SID = "AC260cd4e8e27fad2fe13461826e9e5256" 
+AUTH_TOKEN = "8bc1c3a48457cdc2ccaf277428023ab7" 
+ 
+client = TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN) 
 
 #################### Start function definitions ####################
 
@@ -30,7 +36,12 @@ def pull(driver):
 
 #notify user about space availability 
 def notify():
-	print "notify"
+	client.messages.create(
+    to="+14087817153", 
+    from_="+16503833845", 
+    body="There is space available!", 
+	)
+	#print "notify"
 
 #################### End function definitions ####################
 
